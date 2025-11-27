@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>Sample RSS Feed</title>
+    <link>https://example.com</link>
+    <description>Test RSS feed for unit testing</description>
+    <item>
+      <title>Test Article 1</title>
+      <link>https://example.com/article1</link>
+      <description>This is the content of article 1</description>
+      <pubDate>Mon, 01 Jan 2024 12:00:00 GMT</pubDate>
+      <author>author1@example.com (John Doe)</author>
+      <category>Tech</category>
+      <category>AI</category>
+      <media:content url="https://example.com/image1.jpg" medium="image" />
+    </item>
+    <item>
+      <title>Test Article 2</title>
+      <link>https://example.com/article2</link>
+      <description>This is the content of article 2 with more details</description>
+      <pubDate>Tue, 02 Jan 2024 14:30:00 GMT</pubDate>
+      <author>author2@example.com (Jane Smith)</author>
+    </item>
+    <item>
+      <title>Test Article 3</title>
+      <link>https://example.com/article3</link>
+      <description>Article 3 content</description>
+      <pubDate>Wed, 03 Jan 2024 10:15:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

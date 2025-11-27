@@ -1,0 +1,15 @@
+[project]
+name = "newsfeed"
+version = "0.1.0"
+description = "A real-time newsfeed system that aggregates IT-related news items from selected public sources, classify those into a list of categories and create an API to allow LLM applications to search and retrieve those documents."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pre-commit>=4.5.0",
+    "pytest>=9.0.1",
+    "ruff>=0.14.6",
+]

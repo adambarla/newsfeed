@@ -4,12 +4,31 @@ version = "0.1.0"
 description = "A real-time newsfeed system that aggregates IT-related news items from selected public sources, classify those into a list of categories and create an API to allow LLM applications to search and retrieve those documents."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "aiosqlite>=0.21.0",
+    "beautifulsoup4>=4.12.3",
+    "chromadb>=1.3.5",
+    "fastapi>=0.122.0",
+    "feedparser>=6.0.11",
+    "google-generativeai>=0.8.5",
+    "greenlet>=3.2.4",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.12.0",
+    "sentence-transformers>=5.1.2",
+    "sqlmodel>=0.0.27",
+    "uvicorn>=0.38.0",
+]
 
 [dependency-groups]
 dev = [
-    "httpx>=0.28.1",
     "pre-commit>=4.5.0",
     "pytest>=9.0.1",
+    "pytest-asyncio>=0.24.0",
     "ruff>=0.14.6",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
 ]

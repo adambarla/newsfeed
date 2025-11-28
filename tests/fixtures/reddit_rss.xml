@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>r/programming</title>
+    <link>https://www.reddit.com/r/programming/</link>
+    <description>Computer Programming</description>
+    <item>
+      <title>Great article about Python async</title>
+      <link>https://www.reddit.com/r/programming/comments/abc123/great_article_about_python_async/</link>
+      <description>Check out this amazing article about Python async programming</description>
+      <pubDate>Mon, 01 Jan 2024 12:00:00 GMT</pubDate>
+      <author>reddit_user_1</author>
+      <category>programming</category>
+    </item>
+    <item>
+      <title>New JavaScript framework released</title>
+      <link>https://www.reddit.com/r/programming/comments/def456/new_javascript_framework_released/</link>
+      <description>Another day, another JavaScript framework</description>
+      <pubDate>Tue, 02 Jan 2024 14:30:00 GMT</pubDate>
+      <author>reddit_user_2</author>
+    </item>
+  </channel>
+</rss>

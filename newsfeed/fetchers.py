@@ -28,7 +28,17 @@ class NewsFetcher(ABC):
         elif hasattr(entry, "summary"):
             content = entry.summary
 
-        return cls._clean_html(content)
+        cleaned = cls._clean_html(content)
+
+        # Check for Reddit placeholder text
+        if "submitted by" in cleaned and "/u/" in cleaned and "[link]" in cleaned:
+            # It's just a Reddit link wrapper, use the title as content or empty string
+            # Using title ensures embeddings have some semantic meaning to work with
+            if hasattr(entry, "title"):
+                return entry.title
+            return ""
+
+        return cleaned
 
     @staticmethod
     def _clean_html(html_content: str) -> str:

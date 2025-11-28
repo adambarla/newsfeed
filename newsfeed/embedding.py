@@ -25,5 +25,5 @@ class SentenceTransformerEmbedder(NewsEmbedder):
 
     def embed(self, text: str) -> List[float]:
         # The model returns a numpy array, we convert to list for storage/compat
-        embedding = self.model.encode(text)
+        embedding = self.model.encode(text, show_progress_bar=False)
         return embedding.tolist()

@@ -1,4 +1,5 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -34,7 +35,7 @@ class SQLArticleRepository(ArticleRepository):
             result = await session.execute(statement)
             return result.scalars().first() is not None
 
-    async def get(self, article_id: str) -> Optional[ProcessedArticle]:
+    async def get(self, article_id: UUID) -> Optional[ProcessedArticle]:
         async with self.async_session() as session:
             return await session.get(ProcessedArticle, article_id)
 

@@ -4,8 +4,14 @@ import shutil
 from datetime import datetime
 from newsfeed.models import ProcessedArticle, NewsCategory
 from newsfeed.storage import SQLArticleRepository, ChromaVectorIndex
+from newsfeed.classification import NewsClassifier
 from newsfeed.services.news_service import NewsService
 from newsfeed.embedding import SentenceTransformerEmbedder
+
+
+class MockClassifier(NewsClassifier):
+    async def classify(self, text: str) -> NewsCategory:
+        return NewsCategory.OTHER
 
 
 @pytest.mark.asyncio
@@ -54,8 +60,10 @@ async def news_service():
     await repo.init_db()
 
     index = ChromaVectorIndex(chroma_path)
+    classifier = MockClassifier()
+    embedder = SentenceTransformerEmbedder()
 
-    service = NewsService(repo, index)
+    service = NewsService(repo, index, classifier, embedder)
 
     yield service
 
@@ -84,9 +92,8 @@ async def test_service_search_flow(news_service):
     await news_service.add_article(article)
 
     query = "firewall bugs"
-    query_vector = embedder.embed(query)
 
-    results = await news_service.search_articles(query_vector, limit=1)
+    results = await news_service.search_articles(query, limit=1)
 
     # 5. Verify
     assert len(results) == 1

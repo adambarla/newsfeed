@@ -9,4 +9,5 @@ services:
     environment:
       - DATABASE_URL=sqlite+aiosqlite:////app/data/newsfeed.db
       - CHROMADB_PATH=/app/data/chroma
+      - GEMINI_API_KEY=${GEMINI_API_KEY} # Reads from your host env or .env file
     restart: unless-stopped

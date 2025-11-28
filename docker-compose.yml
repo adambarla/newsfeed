@@ -1,0 +1,12 @@
+services:
+  newsfeed:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Maps local 'data' folder to container's '/app/data'
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/newsfeed.db
+      - CHROMADB_PATH=/app/data/chroma
+    restart: unless-stopped

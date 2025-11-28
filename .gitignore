@@ -208,3 +208,8 @@ __marimo__/
 
 # history
 .history/
+
+# Local data directory
+data/
+# VS Code
+.vscode/

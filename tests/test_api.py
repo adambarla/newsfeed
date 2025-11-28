@@ -6,6 +6,8 @@ from unittest.mock import MagicMock, AsyncMock, patch
 from fastapi.testclient import TestClient
 from newsfeed.app import app
 from newsfeed.config import get_settings
+from newsfeed.dependencies import get_news_service
+from newsfeed.services.news_service import NewsService
 from newsfeed.storage import SQLArticleRepository
 from newsfeed.models import NewsCategory, ProcessedArticle
 
@@ -23,8 +25,25 @@ def get_test_settings():
     return settings
 
 
+def get_mock_news_service():
+    mock_repo = MagicMock()
+    mock_index = MagicMock()
+    mock_classifier = MagicMock()
+    mock_classifier.classify = AsyncMock(return_value=NewsCategory.AI_EMERGING_TECH)
+    mock_embedder = MagicMock()
+    mock_embedder.embed.return_value = [0.1] * 384
+
+    return NewsService(
+        repository=mock_repo,
+        index=mock_index,
+        classifier=mock_classifier,
+        embedder=mock_embedder,
+    )
+
+
 # Setup the dependency overrides
 app.dependency_overrides[get_settings] = get_test_settings
+app.dependency_overrides[get_news_service] = get_mock_news_service
 
 client = TestClient(app)
 

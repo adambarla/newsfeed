@@ -4,7 +4,9 @@ from uuid import UUID
 
 from fastapi import FastAPI, Depends, HTTPException
 
+from newsfeed.config import get_settings
 from newsfeed.dependencies import get_repository, get_news_service
+from newsfeed.logger import configure_logging
 from newsfeed.models import NewsCategory, ArticleResponse
 from newsfeed.scheduler import start_scheduler
 from newsfeed.services.news_service import NewsService
@@ -13,7 +15,9 @@ from newsfeed.storage import ArticleRepository
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Initialize the database and scheduler
+    settings = get_settings()
+    configure_logging(settings.LOG_LEVEL)
+
     repo = get_repository()
     await repo.init_db()
 

@@ -1,9 +1,12 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Optional
 
 import google.generativeai as genai
 from newsfeed.models import NewsCategory
+
+logger = logging.getLogger(__name__)
 
 
 class NewsClassifier(ABC):
@@ -70,13 +73,15 @@ class GeminiNewsClassifier(NewsClassifier):
             # We iterate to match case-insensitively or exact match
             for category in NewsCategory:
                 if category.value.lower() == result.lower():
+                    logger.debug(f"Classified article as: {category.value}")
                     return category
 
             # Fallback for unexpected LLM output
+            logger.warning(
+                f"Unexpected classification result: '{result}'. Defaulting to OTHER."
+            )
             return NewsCategory.OTHER
 
         except Exception as e:
-            # Log error in production (using print for now as per simple setup)
-            # retry?
-            print(f"Classification error: {e}")
+            logger.error(f"Classification error: {e}")
             return NewsCategory.OTHER

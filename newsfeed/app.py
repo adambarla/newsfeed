@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 from typing import List, Optional
 from uuid import UUID
-import logging
 
 from fastapi import FastAPI, Depends, HTTPException
 
@@ -10,12 +9,6 @@ from newsfeed.models import NewsCategory, ArticleResponse
 from newsfeed.scheduler import start_scheduler
 from newsfeed.services.news_service import NewsService
 from newsfeed.storage import ArticleRepository
-
-# Configure logging to ensure INFO logs are visible
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
 
 
 @asynccontextmanager

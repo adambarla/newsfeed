@@ -1,3 +1,4 @@
+import logging
 from typing import List, Optional
 from uuid import UUID
 from sqlmodel import select
@@ -6,6 +7,8 @@ from sqlalchemy.orm import sessionmaker
 
 from newsfeed.models import ProcessedArticle
 from newsfeed.storage.article.base import ArticleRepository
+
+logger = logging.getLogger(__name__)
 
 
 class SQLArticleRepository(ArticleRepository):
@@ -19,15 +22,25 @@ class SQLArticleRepository(ArticleRepository):
         """Initializes the database tables."""
         from sqlmodel import SQLModel
 
-        async with self.engine.begin() as conn:
-            await conn.run_sync(SQLModel.metadata.create_all)
+        logger.info("Initializing SQL database...")
+        try:
+            async with self.engine.begin() as conn:
+                await conn.run_sync(SQLModel.metadata.create_all)
+            logger.info("SQL database initialized.")
+        except Exception as e:
+            logger.critical(f"Failed to initialize SQL database: {e}")
+            raise
 
     async def save(self, article: ProcessedArticle) -> ProcessedArticle:
-        async with self.async_session() as session:
-            session.add(article)
-            await session.commit()
-            await session.refresh(article)
-            return article
+        try:
+            async with self.async_session() as session:
+                session.add(article)
+                await session.commit()
+                await session.refresh(article)
+                return article
+        except Exception as e:
+            logger.error(f"Failed to save article to SQL: {e}")
+            raise
 
     async def exists(self, url: str) -> bool:
         async with self.async_session() as session:

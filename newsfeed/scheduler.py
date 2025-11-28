@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -68,7 +69,11 @@ async def run_ingestion():
         except Exception as e:
             logger.error(f"Error processing source {source_name}: {e}", exc_info=True)
 
-    logger.info("Ingestion job completed.")
+    settings = get_settings()
+    next_run = datetime.now() + timedelta(minutes=settings.FETCH_INTERVAL_MINUTES)
+    logger.info(
+        f"Ingestion job completed. Next run scheduled at: {next_run.strftime('%H:%M:%S')}"
+    )
 
 
 def start_scheduler():

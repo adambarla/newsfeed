@@ -1,5 +1,6 @@
 from typing import List, Optional
 from abc import ABC, abstractmethod
+from uuid import UUID
 from newsfeed.models import ProcessedArticle
 
 
@@ -15,7 +16,7 @@ class ArticleRepository(ABC):
         pass
 
     @abstractmethod
-    async def get(self, article_id: str) -> Optional[ProcessedArticle]:
+    async def get(self, article_id: UUID) -> Optional[ProcessedArticle]:
         """Retrieves an article by ID."""
         pass
 

@@ -1,10 +1,14 @@
+import logging
 from typing import List, Optional
+from uuid import UUID
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from newsfeed.models import ProcessedArticle
 from newsfeed.storage.article.base import ArticleRepository
+
+logger = logging.getLogger(__name__)
 
 
 class SQLArticleRepository(ArticleRepository):
@@ -18,15 +22,25 @@ class SQLArticleRepository(ArticleRepository):
         """Initializes the database tables."""
         from sqlmodel import SQLModel
 
-        async with self.engine.begin() as conn:
-            await conn.run_sync(SQLModel.metadata.create_all)
+        logger.info("Initializing SQL database...")
+        try:
+            async with self.engine.begin() as conn:
+                await conn.run_sync(SQLModel.metadata.create_all)
+            logger.info("SQL database initialized.")
+        except Exception as e:
+            logger.critical(f"Failed to initialize SQL database: {e}")
+            raise
 
     async def save(self, article: ProcessedArticle) -> ProcessedArticle:
-        async with self.async_session() as session:
-            session.add(article)
-            await session.commit()
-            await session.refresh(article)
-            return article
+        try:
+            async with self.async_session() as session:
+                session.add(article)
+                await session.commit()
+                await session.refresh(article)
+                return article
+        except Exception as e:
+            logger.error(f"Failed to save article to SQL: {e}")
+            raise
 
     async def exists(self, url: str) -> bool:
         async with self.async_session() as session:
@@ -34,7 +48,7 @@ class SQLArticleRepository(ArticleRepository):
             result = await session.execute(statement)
             return result.scalars().first() is not None
 
-    async def get(self, article_id: str) -> Optional[ProcessedArticle]:
+    async def get(self, article_id: UUID) -> Optional[ProcessedArticle]:
         async with self.async_session() as session:
             return await session.get(ProcessedArticle, article_id)
 

@@ -1,36 +1,50 @@
+# Newsfeed Aggregator
+
+A real-time, intelligent news aggregation system that collects IT news, classifies it using LLMs (Gemini), and provides a semantic search API.
+
+## Features
+
+The system fetches news from RSS feeds (Ars Technica, Tom's Hardware) and Reddit. It automatically categorizes articles using Google Gemini 2.0 and enables natural language search via local embeddings and ChromaDB. Background jobs ensure data is updated every 15 minutes.
+
+## Architecture
+
+The system uses a Modular Monolith design:
+
+1.  **Ingestion**: `APScheduler` triggers fetchers to pull raw data.
+2.  **Processing**:
+    *   Deduplicates URLs.
+    *   Classifies content using LLMs.
+    *   Generates vector embeddings.
+3.  **Storage**: SQLite stores metadata; ChromaDB stores vectors.
+4.  **Serving**: FastAPI exposes endpoints for search and retrieval.
+
 ## Development Setup
 
-1. Install dependencies: `uv sync --group dev`
-2. Configure Environment: `cp .env.example .env # Edit .env to set GEMINI_API_KEY if needed`
-3. Install pre-commit hooks: `uv run pre-commit install`
-4. Run tests:
-    - All tests: `uv run pytest`
-    - Unit tests only (fast): `uv run pytest -m "not integration"`
-    - Integration tests (network calls): `uv run pytest -m integration -s`
-
-**Note:** Pre-commit hooks and tests are automatically enforced on GitHub via CI/CD. All PRs must pass linting and tests before merging.
+1.  Install dependencies: `uv sync --group dev`
+2.  Configure environment: `cp .env.example .env` (Set `GEMINI_API_KEY`)
+3.  Run tests: `uv run pytest`
 
 ## Deployment & Running
 
-### Option 1: Docker
-Builds a self-contained environment with persistent storage. URL: `http://localhost:8000`. Data: Persisted in `./data` folder.
+### Option 1: Docker (Recommended)
+Builds a self-contained environment with persistent storage.
+
 ```bash
 docker compose up --build -d
 ```
 
+The API is available at [http://localhost:8000/docs](http://localhost:8000/docs). The ingestion job runs immediately on startup.
+
 ### Option 2: Local Development
-Runs the app directly on your machine. URL: `http://localhost:8000`
-```sh
+```bash
 uv run main.py
-# or
-uv run uvicorn newsfeed.app:app --reload
 ```
 
 ## API Usage
 
-The API provides endpoints to retrieve and search for news articles.
-
-- Interactive Documentation: [http://localhost:8000/docs](http://localhost:8000/docs) (Swagger UI)
-- Health Check: `GET /health`
-- List Articles: `GET /api/v1/articles?category=Cybersecurity&limit=10`
-- Get Article: `GET /api/v1/articles/{id}`
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/articles/search?query=...` | Semantic search for conceptually similar articles. |
+| `GET` | `/api/v1/articles?category=...` | List articles with optional filtering. |
+| `GET` | `/api/v1/articles/{id}` | Retrieve full article details. |
+| `GET` | `/health` | System health check. |

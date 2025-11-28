@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Any
+import logging
 
 from bs4 import BeautifulSoup
 import feedparser
 import httpx
 
 from newsfeed.models import RawArticle
+
+logger = logging.getLogger(__name__)
 
 
 class NewsFetcher(ABC):
@@ -28,7 +31,17 @@ class NewsFetcher(ABC):
         elif hasattr(entry, "summary"):
             content = entry.summary
 
-        return cls._clean_html(content)
+        cleaned = cls._clean_html(content)
+
+        # Check for Reddit placeholder text
+        if "submitted by" in cleaned and "/u/" in cleaned and "[link]" in cleaned:
+            # It's just a Reddit link wrapper, use the title as content or empty string
+            # Using title ensures embeddings have some semantic meaning to work with
+            if hasattr(entry, "title"):
+                return entry.title
+            return ""
+
+        return cleaned
 
     @staticmethod
     def _clean_html(html_content: str) -> str:
@@ -59,10 +72,15 @@ class RSSFetcher(NewsFetcher):
         self.source_name = source_name
 
     async def fetch(self) -> List[RawArticle]:
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            response = await client.get(self.feed_url)
-            response.raise_for_status()
-            feed = feedparser.parse(response.text)
+        logger.debug(f"Fetching RSS feed for {self.source_name}: {self.feed_url}")
+        try:
+            async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+                response = await client.get(self.feed_url)
+                response.raise_for_status()
+                feed = feedparser.parse(response.text)
+        except Exception as e:
+            logger.error(f"Failed to fetch RSS feed {self.feed_url}: {e}")
+            raise
 
         articles = []
         for entry in feed.entries:
@@ -82,6 +100,7 @@ class RSSFetcher(NewsFetcher):
                 )
             )
 
+        logger.info(f"Fetched {len(articles)} articles from {self.source_name}")
         return articles
 
 
@@ -91,11 +110,16 @@ class RedditFetcher(NewsFetcher):
         self.feed_url = f"https://www.reddit.com/r/{subreddit}/.rss"
 
     async def fetch(self) -> List[RawArticle]:
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            headers = {"User-Agent": "newsfeed-bot/1.0"}
-            response = await client.get(self.feed_url, headers=headers)
-            response.raise_for_status()
-            feed = feedparser.parse(response.text)
+        logger.debug(f"Fetching Reddit feed for r/{self.subreddit}: {self.feed_url}")
+        try:
+            async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+                headers = {"User-Agent": "newsfeed-bot/1.0"}
+                response = await client.get(self.feed_url, headers=headers)
+                response.raise_for_status()
+                feed = feedparser.parse(response.text)
+        except Exception as e:
+            logger.error(f"Failed to fetch Reddit feed {self.feed_url}: {e}")
+            raise
 
         articles = []
         for entry in feed.entries:
@@ -115,6 +139,7 @@ class RedditFetcher(NewsFetcher):
                 )
             )
 
+        logger.info(f"Fetched {len(articles)} articles from r/{self.subreddit}")
         return articles
 
     @staticmethod

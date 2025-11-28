@@ -44,3 +44,15 @@ class ProcessedArticle(SQLModel, table=True):
 
     # Add this field (stored as JSON in SQL for backup, used by Chroma)
     embedding: Optional[List[float]] = Field(default=None, sa_column=Column(JSON))
+
+
+class ArticleResponse(SQLModel):
+    id: UUID
+    url: str
+    title: str
+    content: str
+    category: NewsCategory
+    source: str
+    published_at: datetime
+    created_at: datetime
+    metadata_fields: dict

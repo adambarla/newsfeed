@@ -32,8 +32,20 @@ To ensure deployability, I containerized the application using **Docker**. The s
 
 I verified this layer with unit tests for the storage logic and integration tests for the API endpoints. I also validated the full deployment flow by building and running the Docker container locally, confirming that the service starts correctly and the persistence layer is active.
 
+## Classification & Search
+
+I implemented the classification layer using **Google's Gemini 2.0 Flash** model via the `GeminiNewsClassifier`. This component takes article text and categorizes it into one of the predefined categories (e.g., Cybersecurity, AI & Emerging Tech). I verified this implementation with both mocked unit tests and live integration tests against the Google AI API.
+
+I also upgraded the `NewsService` to act as the central ingestion pipeline, orchestrating:
+1.  Deduplication: Checking for existing URLs.
+2.  Classification: Using the LLM to categorize content.
+3.  Embedding: Generating vector embeddings using `SentenceTransformers`.
+4.  Storage: Saving metadata to SQLite and vectors to ChromaDB.
+
+I exposed a new `/api/v1/articles/search` endpoint that enables **semantic search**. This allows users to find relevant articles using natural language queries (e.g., "LLM advances") rather than just keyword matching. I verified the recall and precision of this feature with integration tests that inserted diverse articles and confirmed that search queries retrieved the correct matches while filtering out irrelevant ones.
+
 ## Future Work
 
-While the current implementation provides a solid foundation, there are several areas I plan to address next. I need to add proper logging and retry logic to handle network instability robustly. I also plan to implement the classifier and storage components to complete the ingestion pipeline.
+I plan to implement the **Scheduler** to run the ingestion pipeline periodically. I also need to add proper logging and retry logic to handle network instability robustly.
 
 I will continue to refine the error handling and add more comprehensive tests as we encounter edge cases during further development.

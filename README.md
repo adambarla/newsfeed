@@ -28,10 +28,19 @@ The system uses a Modular Monolith design:
 
 ### Option 1: Docker (Recommended)
 Builds a self-contained environment with persistent storage.
-docker compose up --build -dThe API is available at [http://localhost:8000/docs](http://localhost:8000/docs). The ingestion job runs immediately on startup.
+
+```bash
+docker compose up --build -d
+```
+
+The API is available at [http://localhost:8000/docs](http://localhost:8000/docs). The ingestion job runs immediately on startup.
 
 ### Option 2: Local Development
-uv run main.py## API Usage
+```bash
+uv run main.py
+```
+
+## API Usage
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |

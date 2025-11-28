@@ -42,7 +42,5 @@ class ProcessedArticle(SQLModel, table=True):
     # SQLite doesn't have a native array type, so we use JSON
     metadata_fields: dict = Field(default_factory=dict, sa_column=Column(JSON))
 
-    # We won't store the embedding directly in the main SQL table for now,
-    # or strictly as a column, usually it's in the vector store.
-    # But if we wanted to simple store it:
-    # embedding: Optional[List[float]] = Field(default=None, sa_column=Column(JSON))
+    # Add this field (stored as JSON in SQL for backup, used by Chroma)
+    embedding: Optional[List[float]] = Field(default=None, sa_column=Column(JSON))

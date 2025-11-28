@@ -17,11 +17,16 @@ I have verified that the fetchers successfully capture full content from Reddit 
 
 ## Storage & API
 
-I implemented the persistent storage layer and the public API to serve the processed news.
+I chose a **Modular Monolith** approach using **SQLite** with `SQLModel`. This provides the reliability of a relational database without the operational overhead of a separate server. I defined a `ProcessedArticle` model that stores the core article data along with metadata like categories and source information.
 
-For storage, I chose a **Modular Monolith** approach using **SQLite** with `SQLModel`. This provides the reliability of a relational database without the operational overhead of a separate server. I defined a `ProcessedArticle` model that stores the core article data along with metadata like categories and source information. I abstracted the database operations behind a `NewsStore` interface, allowing for easy swapping of storage backends (e.g., for testing) and implemented an asynchronous `SQLModelStore`.
+To support semantic search, I implemented a split architecture:
+1.  Repository Layer: `SQLArticleRepository` manages persistent storage of article metadata.
+2.  Vector Index: `ChromaVectorIndex` manages embeddings for similarity search.
+3.  Service Layer: `NewsService` orchestrates the two, handling the logic to save to both stores and merge search results.
 
-For the API, I built a **FastAPI** application that exposes endpoints to retrieve articles by ID and list them with category filtering. I refactored the project structure to follow Python packaging best practices, moving the core application logic into the `newsfeed` package while keeping a lightweight entry point at the root.
+## API
+
+I built a **FastAPI** application that exposes endpoints to retrieve articles by ID and list them with category filtering. I refactored the project structure to follow Python packaging best practices, moving the core application logic into the `newsfeed` package while keeping a lightweight entry point at the root.
 
 To ensure deployability, I containerized the application using **Docker**. The setup includes a multi-stage build using `uv` for efficient dependency management and configures a persistent volume to ensure data survives container restarts.
 
